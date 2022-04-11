@@ -55,53 +55,38 @@ df_data['Title'] = df_data['Title'].replace(['Capt', 'Col', 'Countess', 'Don',
 df_data['Title'] = df_data['Title'].replace(['Mlle', 'Ms', 'Mme'],'Miss')
 df_data['Title'] = df_data['Title'].replace(['Lady'],'Mrs')
 df_data['Title'] = df_data['Title'].map({"Mr": 0, "Rare" : 1, "Master" : 2,"Miss" : 3, "Mrs" : 4 })
-##print(df_data['Title'].value_counts())
 df_data.drop(labels=['Name'], axis=1, inplace=True)
-Ti = df_data.groupby('Title')['Age'].median()
 
 df_data = pd.get_dummies(data=df_data, columns=['Sex'])
 #df_data.drop(['Sex_female'], axis=1, inplace=True)
 df_data.drop(['Sex_male'], axis=1, inplace=True)
 df_data.head()
-#print(df_data.info)
-
-#print(df_data.isnull().sum())
 
 df_train = df_data[:len(df_train)]
 df_test = df_data[len(df_train):]
-
-#print(df_test.isnull().sum())
 
 #print(df.corr())
 X = df_train.drop(['Survived', 'Pclass', 'PassengerId', "Embarked"], axis=1)
 #X = df.drop(['Survived', 'Pclass', 'PassengerId', 'Parch'], axis=1)
 Y = df_train['Survived']
 
-xTrain, xTest, yTrain, yTest = tts(X, Y, test_size=0.10, random_state=100) #logistic regression 0.25 67
-
-# Logistic Regression
-#lr = LogisticRegression(max_iter=3000)
-#lr.fit(xTrain, yTrain)
-
-# Decision Tree
-#dt = DecisionTreeClassifier(random_state=10)
-#dt.fit(xTrain, yTrain)
+#xTrain, xTest, yTrain, yTest = tts(X, Y, test_size=0.10, random_state=100) #logistic regression 0.25 67
 
 #Random Forest
 rf = RandomForestClassifier(n_estimators=250, random_state=2, min_samples_split=10, oob_score=True)
 rf.fit(X, Y)
 
 #result
-prediction = rf.predict(xTest)
+#prediction = rf.predict(xTest)
 #prediction = dt.predict(xTest)
 #prediction = knn.predict(xTest)
 #print('accuracy_score: ', accuracy_score(prediction, yTest))
 #print('recall_score: ', recall_score(prediction, yTest))
 #print('precision_score: ', precision_score(prediction, yTest))
 print('oob_score: ', rf.oob_score_)
-pd.DataFrame(confusion_matrix(yTest, prediction), columns=['Predict not Survived', 'Predict Survived'], index=['True not Survived', 'True Survived'])
+#pd.DataFrame(confusion_matrix(yTest, prediction), columns=['Predict not Survived', 'Predict Survived'], index=['True not Survived', 'True Survived'])
 
-importances = pd.DataFrame({'feature':xTrain.columns,'importance':np.round(rf.feature_importances_,3)})
+importances = pd.DataFrame({'feature':X.columns,'importance':np.round(rf.feature_importances_,3)})
 importances = importances.sort_values('importance',ascending=False).set_index('feature')
 importances.plot.bar()
 
